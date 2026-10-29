@@ -18,7 +18,7 @@ export interface StoredMessage {
   created_at: string;
 }
 
-const db = supabase as any;
+const db = supabase;
 
 export async function listConversations(): Promise<Conversation[]> {
   const { data, error } = await db

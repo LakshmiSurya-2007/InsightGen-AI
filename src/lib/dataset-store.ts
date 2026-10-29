@@ -1,7 +1,9 @@
 // Supabase-backed dataset store. Datasets are persisted per user and
 // the most recently used one is cached in sessionStorage for quick access.
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 
+type DatasetRow = Database["public"]["Tables"]["datasets"]["Row"];
 type Row = Record<string, string | number | null>;
 
 export interface DatasetSummary {
@@ -25,7 +27,9 @@ export function setActiveDatasetId(id: string | null) {
   try {
     if (id) sessionStorage.setItem(ACTIVE_KEY, id);
     else sessionStorage.removeItem(ACTIVE_KEY);
-  } catch {}
+  } catch {
+    // sessionStorage not available in current environment
+  }
 }
 
 export function getActiveDatasetId(): string | null {
@@ -143,17 +147,17 @@ export async function deleteDataset(id: string) {
   if (getActiveDatasetId() === id) setActiveDatasetId(null);
 }
 
-function rowToSummaryMeta(r: any): DatasetSummary {
+function rowToSummaryMeta(r: Partial<DatasetRow> & { id: string; name: string }): DatasetSummary {
   return {
     id: r.id,
     name: r.name,
-    rows: r.row_count,
-    cols: r.col_count,
-    columns: r.columns ?? [],
-    numericCols: r.numeric_cols ?? [],
-    categoricalCols: r.categorical_cols ?? [],
-    missing: r.missing,
-    stats: r.stats ?? {},
+    rows: r.row_count ?? 0,
+    cols: r.col_count ?? 0,
+    columns: (r.columns as string[]) ?? [],
+    numericCols: (r.numeric_cols as string[]) ?? [],
+    categoricalCols: (r.categorical_cols as string[]) ?? [],
+    missing: r.missing ?? 0,
+    stats: (r.stats as DatasetSummary["stats"]) ?? {},
     data: [],
     preview: [],
     createdAt: r.created_at,

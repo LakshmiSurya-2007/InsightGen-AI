@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Database, ChevronDown, Upload, Check, FileSpreadsheet, Plus } from "lucide-react";
 import {
@@ -18,7 +18,7 @@ export function DatasetSelector({
   const [open, setOpen] = useState(false);
   const [list, setList] = useState<DatasetSummary[]>([]);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     const all = await listDatasets();
     setList(all);
     const activeId = getActiveDatasetId();
@@ -30,9 +30,11 @@ export function DatasetSelector({
         onChange(full);
       }
     }
-  };
+  }, [value, onChange]);
 
-  useEffect(() => { refresh(); /* eslint-disable-next-line */ }, []);
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
 
   const pick = async (id: string) => {
     setOpen(false);

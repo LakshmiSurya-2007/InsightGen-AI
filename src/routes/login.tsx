@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { AuthShell, GoogleButton, Divider } from "@/components/auth/AuthShell";
+import { AuthShell, Divider } from "@/components/auth/AuthShell";
+import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 
 export const Route = createFileRoute("/login")({ component: Login });
 
@@ -25,22 +26,10 @@ function Login() {
     navigate({ to: "/dashboard" });
   };
 
-  const google = async () => {
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/dashboard` },
-    });
-    if (error) {
-      toast.error(error.message || "Google sign-in failed. Please try again.");
-      setLoading(false);
-    }
-  };
-
   return (
     <AuthShell title="Welcome back" subtitle="Sign in to your InsightGen AI workspace.">
       <form className="space-y-4" onSubmit={submit}>
-        <GoogleButton onClick={google} disabled={loading} />
+        <GoogleSignInButton mode="signin" disabled={loading} />
         <Divider />
         <div className="space-y-1.5">
           <Label htmlFor="email">Email</Label>

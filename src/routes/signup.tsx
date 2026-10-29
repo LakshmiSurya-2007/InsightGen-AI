@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { AuthShell, GoogleButton, Divider } from "@/components/auth/AuthShell";
+import { AuthShell, Divider } from "@/components/auth/AuthShell";
+import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 
 export const Route = createFileRoute("/signup")({ component: Signup });
 
@@ -33,22 +34,10 @@ function Signup() {
     navigate({ to: "/dashboard" });
   };
 
-  const google = async () => {
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/dashboard` },
-    });
-    if (error) {
-      toast.error(error.message || "Google sign-up failed. Please try again.");
-      setLoading(false);
-    }
-  };
-
   return (
     <AuthShell title="Create your free account" subtitle="No credit card. Free forever.">
       <form className="space-y-4" onSubmit={submit}>
-        <GoogleButton onClick={google} disabled={loading} />
+        <GoogleSignInButton mode="signup" disabled={loading} />
         <Divider />
         <div className="space-y-1.5">
           <Label htmlFor="name">Full name</Label>
